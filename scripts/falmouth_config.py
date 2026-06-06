@@ -65,8 +65,8 @@ BLUE_HOLE_ALT = (
 )
 BEACH_IMG = "images/jamaica-beach.png"
 BEACH_ALT = (
-    "White sand Jamaica beach and turquoise Caribbean water on a cruise "
-    "passenger beach escape shore excursion from Falmouth"
+    "Turquoise waves rolling onto a white sand Jamaica beach with lush "
+    "tropical coastline near Falmouth for cruise passenger beach excursions"
 )
 COUNTRYSIDE_IMG = "images/jamaica-countryside.png"
 COUNTRYSIDE_ALT = (
