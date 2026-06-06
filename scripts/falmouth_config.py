@@ -23,13 +23,13 @@ HOME_HERO_ALT = (
 )
 PORT_IMG = "images/falmouth-cruise-port.png"
 PORT_ALT = (
-    "Falmouth Jamaica cruise port with cruise ship docked at Historic Falmouth "
-    "Pier for cruise passenger shore excursion pickups"
+    "Cruise ship docked at Falmouth Jamaica cruise port pier with turquoise "
+    "Caribbean water and tropical hills for cruise passenger shore excursions"
 )
 PORT_ARRIVAL_IMG = "images/falmouth-port-arrival.png"
 PORT_ARRIVAL_ALT = (
-    "Cruise ship docked at Falmouth Jamaica Historic Pier with passengers "
-    "disembarking for shore excursions in Trelawny parish"
+    "Cruise ship moored at Historic Falmouth Pier Jamaica with port buildings "
+    "and lush green coastline for cruise passenger arrival and shore excursions"
 )
 BEST_IMG = "images/best-falmouth-excursions.png"
 BEST_ALT = (
