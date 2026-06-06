@@ -85,6 +85,84 @@ def page_shell(
 """
 
 
+def abs_images(html: str) -> str:
+    """Use root-relative image paths so images resolve on every page."""
+    return (
+        html.replace('src="images/', 'src="/images/')
+        .replace("url('images/", "url('/images/")
+        .replace('url("images/', 'url("/images/')
+    )
+
+
+def static_page_shell(
+    *,
+    title: str,
+    description: str,
+    keywords: str,
+    canonical_path: str,
+    data_page: str,
+    nav: str,
+    hero: str,
+    content: str,
+    footer: str,
+    preload: str = HOME_HERO,
+    schema: dict | None = None,
+    trust: str = "",
+) -> str:
+    canon = f"{DOMAIN}/" if not canonical_path else f"{DOMAIN}/{canonical_path}"
+    preload_path = preload if preload.startswith("/") else f"/{preload}"
+    schema_block = ""
+    if schema:
+        schema_block = (
+            f'  <script type="application/ld+json">\n'
+            f"{json.dumps(schema, indent=2)}\n"
+            f"  </script>\n"
+        )
+    trust_html = abs_images(trust) if trust else ""
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title}</title>
+  <meta name="description" content="{description}" />
+  <meta name="keywords" content="{keywords}" />
+  <link rel="canonical" href="{canon}" />
+  <link rel="preload" as="image" href="{preload_path}" fetchpriority="high" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="{canon}" />
+  <meta property="og:title" content="{title}" />
+  <meta property="og:description" content="{description}" />
+  <meta property="og:image" content="{DOMAIN}{preload_path}" />
+  <meta property="og:site_name" content="{SITE}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="geo.region" content="JM" />
+  <meta name="geo.placename" content="Falmouth, Jamaica" />
+
+{schema_block}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="{FONTS}" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body class="bg-white text-gray-800 antialiased" data-page="{data_page}">
+
+{abs_images(nav)}
+{abs_images(hero)}
+{trust_html}
+<main id="page-content">{abs_images(content)}</main>
+{abs_images(footer)}
+
+  <script src="/js/site.js"></script>
+</body>
+</html>
+"""
+
+
 def cruise_snapshot(
     *,
     time_in_port: str,

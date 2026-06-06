@@ -40,7 +40,7 @@ from falmouth_config import (
     BEACH_IMG,
 )
 from falmouth_guides import all_guide_content, home_faq_data
-from falmouth_helpers import hero_inner, hero_wave, home_schema, page_shell, tourist_trip_schema
+from falmouth_helpers import hero_inner, hero_wave, home_schema, static_page_shell, tourist_trip_schema
 from falmouth_tours import all_tour_content
 from falmouth_tours_data import SITEMAP_PAGES, TOURS
 
@@ -372,17 +372,31 @@ def main() -> None:
     for name, html in all_tour_content().items():
         write(f"content/{name}", html)
 
+    nav = nav_html()
+    footer = footer_html()
+    trust = trust_strip_html()
+    heroes = build_hero_defs()
+    guides = all_guide_content()
+    tours = all_tour_content()
+
     for p in build_page_meta():
+        hero_key = p["hero"].replace("partials/", "")
+        content_key = p["content"] if p["content"].endswith(".html") else f"{p['content']}.html"
+        if content_key.startswith("content/"):
+            content_key = content_key.replace("content/", "")
         write(
             p["file"],
-            page_shell(
+            static_page_shell(
                 title=p["title"],
                 description=p["description"],
                 keywords=p["keywords"],
                 canonical_path=p["path"],
                 data_page=p["data_page"],
-                hero=p["hero"],
-                content=p["content"],
+                nav=nav,
+                hero=heroes.get(hero_key, ""),
+                content=guides.get(content_key) or tours.get(content_key, ""),
+                footer=footer,
+                trust=trust,
                 preload=p.get("preload", HOME_HERO),
                 schema=p.get("schema"),
             ),
@@ -453,9 +467,25 @@ echo "Done. Check {DOMAIN}/ shortly."
 
     images_dir = ROOT / "images"
     images_dir.mkdir(exist_ok=True)
+    backfill = {
+        "falmouth-intro.png": "hero-falmouth.png",
+        "best-falmouth-excursions.png": "dunns-river-falls.png",
+        "one-day-falmouth.png": "dunns-river-falls.png",
+        "jamaica-countryside.png": "martha-brae-rafting.png",
+        "private-tour-jamaica.png": "falmouth-cruise-port.png",
+        "jamaican-rum.png": "falmouth-cruise-port.png",
+        "jamaica-highlights.png": "falmouth-cruise-port.png",
+        "river-tubing-jamaica.png": "martha-brae-rafting.png",
+        "falmouth-faq.png": "falmouth-cruise-port.png",
+        "falmouth-safety.png": "falmouth-cruise-port.png",
+    }
     for img in ALL_IMAGES:
         p = ROOT / img
         if p.exists() and p.stat().st_size > 5000:
+            continue
+        source = backfill.get(p.name)
+        if source and (images_dir / source).exists() and (images_dir / source).stat().st_size > 5000:
+            p.write_bytes((images_dir / source).read_bytes())
             continue
         p.write_bytes(PLACEHOLDER_PNG)
 

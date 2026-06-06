@@ -43,17 +43,20 @@
     const hero = document.body.dataset.hero;
     const content = document.body.dataset.content;
     const trustStrip = document.body.dataset.trustStrip;
+    const needsPartials = hero || content || trustStrip;
 
-    await Promise.all([
-      loadInto('site-nav', 'partials/nav.html'),
-      loadInto('site-footer', 'partials/footer.html'),
-      loadInto('page-hero', hero),
-      loadInto('page-trust-strip', trustStrip),
-      loadInto('page-content', content),
-    ]);
+    if (needsPartials) {
+      await Promise.all([
+        loadInto('site-nav', 'partials/nav.html'),
+        loadInto('site-footer', 'partials/footer.html'),
+        loadInto('page-hero', hero),
+        loadInto('page-trust-strip', trustStrip),
+        loadInto('page-content', content),
+      ]);
 
-    if (typeof tailwind !== 'undefined' && typeof tailwind.refresh === 'function') {
-      tailwind.refresh();
+      if (typeof tailwind !== 'undefined' && typeof tailwind.refresh === 'function') {
+        tailwind.refresh();
+      }
     }
 
     setActiveNav();
