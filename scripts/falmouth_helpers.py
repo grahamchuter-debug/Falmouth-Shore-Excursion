@@ -336,7 +336,7 @@ def card_grid(cards: list[tuple]) -> str:
     for img, alt, title, desc, link, label in cards:
         items.append(f"""<div class="card-hover bg-white rounded-3xl overflow-hidden shadow-md border border-pr-50 flex flex-col">
       <div class="card-media h-44 relative overflow-hidden">
-        <img src="{img}" alt="{alt}" width="600" height="352" loading="lazy" decoding="async" />
+        <img src="{img}" alt="{alt}" width="600" height="352" decoding="async" />
       </div>
       <div class="p-6 flex flex-col flex-1">
         <h3 class="text-lg font-display font-semibold text-gray-900 mb-2">{title}</h3>
