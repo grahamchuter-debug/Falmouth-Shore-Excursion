@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "falmouth-shore-excursion",
+  "compatibility_date": "2026-06-06",
+  "observability": { "enabled": true },
+  "assets": { "directory": "." },
+  "routes": [
+    {
+      "pattern": "falmouthshoreexcursion.com",
+      "custom_domain": true
+    }
+  ]
+}

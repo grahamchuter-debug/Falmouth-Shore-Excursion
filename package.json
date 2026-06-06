@@ -1,0 +1,14 @@
+{
+  "name": "falmouth-shore-excursion",
+  "private": true,
+  "scripts": {
+    "build": "python3 scripts/build-falmouth-site.py",
+    "images": "python3 scripts/fetch-falmouth-images.py",
+    "check": "python3 scripts/check-falmouth-site.py",
+    "deploy": "wrangler deploy",
+    "preview": "python3 -m http.server 8910"
+  },
+  "devDependencies": {
+    "wrangler": "^4.94.0"
+  }
+}
