@@ -52,6 +52,10 @@
       loadInto('page-content', content),
     ]);
 
+    if (typeof tailwind !== 'undefined' && typeof tailwind.refresh === 'function') {
+      tailwind.refresh();
+    }
+
     setActiveNav();
   });
 })();

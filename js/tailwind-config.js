@@ -1,4 +1,12 @@
 tailwind.config = {
+  safelist: [
+    'h-40', 'h-44', 'grid', 'gap-6', 'gap-12',
+    'sm:grid-cols-2', 'lg:grid-cols-3', 'lg:grid-cols-4',
+    'card-hover', 'card-media', 'btn-ocean', 'btn-primary', 'btn-outline',
+    'rounded-3xl', 'shadow-md', 'border-pr-50', 'border-pr-100',
+    'text-ocean-600', 'bg-sand-50', 'bg-amber-50', 'bg-white',
+    'aspect-[4/3]', 'aspect-[21/9]',
+  ],
   theme: {
     extend: {
       colors: {

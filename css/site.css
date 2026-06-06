@@ -13,7 +13,15 @@ h1, h2, h3, h4 { font-family: 'Outfit', system-ui, sans-serif; }
     0 6px 16px rgba(249, 115, 22, 0.1);
 }
 
-.card-media { overflow: hidden; }
+.card-media {
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  min-height: 11rem;
+}
+
+.card-media.h-40 { min-height: 10rem; }
+.card-media.h-44 { min-height: 11rem; }
 
 .card-media img,
 .info-image img {
@@ -21,6 +29,11 @@ h1, h2, h3, h4 { font-family: 'Outfit', system-ui, sans-serif; }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.info-image {
+  position: relative;
+  overflow: hidden;
 }
 
 .card-media img {
