@@ -17,8 +17,9 @@ ACCENT = "text-pr-300"
 
 HOME_HERO = "images/hero-falmouth.png"
 HOME_HERO_ALT = (
-    "Dunns River Falls cascading waterfall in Jamaica for cruise passengers "
-    "planning shore excursions from Falmouth Jamaica cruise port"
+    "Cascading tiers of Dunn's River Falls in Jamaica with lush green foliage "
+    "and turquoise pool — iconic shore excursion destination for cruise "
+    "passengers visiting Falmouth Jamaica cruise port"
 )
 PORT_IMG = "images/falmouth-cruise-port.png"
 PORT_ALT = (
@@ -47,8 +48,8 @@ INTRO_ALT = (
 )
 DUNNS_IMG = "images/dunns-river-falls.png"
 DUNNS_ALT = (
-    "Cruise passengers climbing Dunns River Falls during a shore excursion "
-    "from Falmouth Jamaica cruise port in Ocho Rios"
+    "Cruise passengers climbing the terraced limestone rocks of Dunn's River "
+    "Falls in Jamaica during a shore excursion from Falmouth cruise port"
 )
 MARTHA_IMG = "images/martha-brae-rafting.png"
 MARTHA_ALT = (
