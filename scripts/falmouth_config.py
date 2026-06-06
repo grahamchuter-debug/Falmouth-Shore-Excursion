@@ -59,8 +59,9 @@ MARTHA_ALT = (
 )
 BLUE_HOLE_IMG = "images/blue-hole-jamaica.png"
 BLUE_HOLE_ALT = (
-    "Blue Hole waterfalls and swimming area in Jamaica rainforest on an "
-    "adventure shore excursion from Falmouth cruise port"
+    "Turquoise Blue Hole lagoon with cascading waterfall and lush tropical "
+    "rainforest on a Jamaica adventure shore excursion from Falmouth cruise "
+    "port"
 )
 BEACH_IMG = "images/jamaica-beach.png"
 BEACH_ALT = (
