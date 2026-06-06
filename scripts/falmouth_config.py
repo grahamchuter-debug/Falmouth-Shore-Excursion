@@ -53,8 +53,9 @@ DUNNS_ALT = (
 )
 MARTHA_IMG = "images/martha-brae-rafting.png"
 MARTHA_ALT = (
-    "Bamboo rafting on Martha Brae River Jamaica on a tranquil shore "
-    "excursion for cruise passengers from Falmouth port"
+    "Cruise passengers enjoying a peaceful bamboo rafting tour on the "
+    "turquoise Martha Brae River surrounded by lush tropical forest near "
+    "Falmouth Jamaica cruise port"
 )
 BLUE_HOLE_IMG = "images/blue-hole-jamaica.png"
 BLUE_HOLE_ALT = (
