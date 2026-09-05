@@ -1,0 +1,8 @@
+node_modules
+.git
+.wrangler
+scripts/__pycache__
+*.pyc
+.DS_Store
+npm-debug.log
+package-lock.json
