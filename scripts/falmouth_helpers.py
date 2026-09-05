@@ -1,4 +1,6 @@
-"""HTML helpers for Falmouth Shore Excursion site build."""
+"""HTML helpers for Falmouth Shore Excursion World 2.0 site build."""
+from __future__ import annotations
+
 import json
 
 from falmouth_config import (
@@ -12,77 +14,12 @@ from falmouth_config import (
 )
 
 
-def page_shell(
-    *,
-    title: str,
-    description: str,
-    keywords: str,
-    canonical_path: str,
-    data_page: str,
-    hero: str,
-    content: str,
-    preload: str = HOME_HERO,
-    schema: dict | None = None,
-    trust: bool = True,
-) -> str:
-    canon = f"{DOMAIN}/" if not canonical_path else f"{DOMAIN}/{canonical_path}"
-    schema_block = ""
-    if schema:
-        schema_block = (
-            f'  <script type="application/ld+json">\n'
-            f"{json.dumps(schema, indent=2)}\n"
-            f"  </script>\n"
-        )
-    trust_attr = '\n  data-trust-strip="partials/trust-strip.html"' if trust else ""
-    content_file = content if content.startswith("content/") else f"content/{content}"
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>{title}</title>
-  <meta name="description" content="{description}" />
-  <meta name="keywords" content="{keywords}" />
-  <link rel="canonical" href="{canon}" />
-  <link rel="preload" as="image" href="{preload}" fetchpriority="high" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="{canon}" />
-  <meta property="og:title" content="{title}" />
-  <meta property="og:description" content="{description}" />
-  <meta property="og:image" content="{DOMAIN}/{preload}" />
-  <meta property="og:site_name" content="{SITE}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="geo.region" content="JM" />
-  <meta name="geo.placename" content="Falmouth, Jamaica" />
-
-{schema_block}
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="{FONTS}" rel="stylesheet" />
-  <link rel="stylesheet" href="css/site.css" />
-</head>
-<body
-  class="bg-white text-gray-800 antialiased"
-  data-page="{data_page}"
-  data-base=""
-  data-hero="{hero}"
-  data-content="{content_file}"{trust_attr}
->
-
-  <div id="site-nav"></div>
-  <div id="page-hero"></div>
-  <div id="page-trust-strip"></div>
-  <main id="page-content"></main>
-  <div id="site-footer"></div>
-
-  <script src="js/site.js"></script>
-</body>
-</html>
-"""
+def href(path: str) -> str:
+    """Extensionless canonical path for internal links."""
+    if not path or path in ("/", "index.html", "index"):
+        return "/"
+    p = path.removesuffix(".html").lstrip("/")
+    return f"/{p}"
 
 
 def abs_images(html: str) -> str:
@@ -106,21 +43,55 @@ def static_page_shell(
     content: str,
     footer: str,
     preload: str = HOME_HERO,
-    schema: dict | None = None,
+    schema: dict | list | None = None,
     trust: str = "",
+    main_pad: bool = False,
 ) -> str:
-    canon = f"{DOMAIN}/" if not canonical_path else f"{DOMAIN}/{canonical_path}"
+    canon = (
+        f"{DOMAIN}/"
+        if not canonical_path or canonical_path in ("/", "index.html")
+        else f"{DOMAIN}/{canonical_path.removesuffix('.html').lstrip('/')}"
+    )
     preload_path = preload if preload.startswith("/") else f"/{preload}"
-    schema_block = ""
+
+    graph: list = [
+        {
+            "@type": "WebSite",
+            "name": SITE,
+            "url": f"{DOMAIN}/",
+            "description": "Independent planning guide for Falmouth Jamaica cruise shore excursions",
+            "inLanguage": "en-GB",
+        },
+        {
+            "@type": "WebPage",
+            "name": title.replace("&amp;", "&"),
+            "url": canon,
+            "description": description,
+            "isPartOf": {"@type": "WebSite", "name": SITE, "url": f"{DOMAIN}/"},
+            "inLanguage": "en-GB",
+        },
+    ]
     if schema:
-        schema_block = (
-            f'  <script type="application/ld+json">\n'
-            f"{json.dumps(schema, indent=2)}\n"
-            f"  </script>\n"
-        )
+        if isinstance(schema, list):
+            graph.extend(schema)
+        elif isinstance(schema, dict):
+            if schema.get("@graph"):
+                graph.extend(schema["@graph"])
+            elif schema.get("@type") == "FAQPage":
+                graph.append({k: v for k, v in schema.items() if k != "@context"})
+            else:
+                item = {k: v for k, v in schema.items() if k != "@context"}
+                graph.append(item)
+
+    schema_block = (
+        '  <script type="application/ld+json">\n'
+        + json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
+        + "\n  </script>\n"
+    )
     trust_html = abs_images(trust) if trust else ""
+    main_class = ' class="pt-16"' if main_pad else ""
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -137,25 +108,35 @@ def static_page_shell(
   <meta property="og:description" content="{description}" />
   <meta property="og:image" content="{DOMAIN}{preload_path}" />
   <meta property="og:site_name" content="{SITE}" />
+  <meta property="og:locale" content="en_GB" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{title}" />
+  <meta name="twitter:description" content="{description}" />
+  <meta name="twitter:image" content="{DOMAIN}{preload_path}" />
   <meta name="geo.region" content="JM" />
   <meta name="geo.placename" content="Falmouth, Jamaica" />
 
 {schema_block}
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
+  <script src="/js/tailwind-config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="{FONTS}" rel="stylesheet" />
   <link rel="stylesheet" href="/css/site.css" />
 </head>
-<body class="bg-white text-gray-800 antialiased" data-page="{data_page}">
+<body class="bg-white text-gray-800 antialiased" data-page="{data_page}" data-base="">
 
+  <div id="site-nav" data-inlined="true">
 {abs_images(nav)}
+  </div>
+  <div id="page-hero" data-inlined="true">
 {abs_images(hero)}
-{trust_html}
-<main id="page-content">{abs_images(content)}</main>
+  </div>
+{('<div id="page-trust-strip" data-inlined="true">' + trust_html + '</div>') if trust_html else ''}
+<main id="page-content" data-inlined="true"{main_class}>{abs_images(content)}</main>
+  <div id="site-footer" data-inlined="true">
 {abs_images(footer)}
+  </div>
 
   <script src="/js/site.js"></script>
 </body>
@@ -179,7 +160,7 @@ def cruise_snapshot(
     <div class="cruise-snapshot__item"><dt>Best For</dt><dd>{best_for}</dd></div>
     <div class="cruise-snapshot__item"><dt>Activity Level</dt><dd>{activity_level}</dd></div>
     <div class="cruise-snapshot__item"><dt>Family Friendly</dt><dd>{family}</dd></div>
-    <div class="cruise-snapshot__item"><dt>Return To Ship Friendly</dt><dd>{return_ship}</dd></div>
+    <div class="cruise-snapshot__item"><dt>Return To Ship Planning</dt><dd>{return_ship}</dd></div>
     <div class="cruise-snapshot__item"><dt>Popular Excursion Types</dt><dd>{popular}</dd></div>
   </dl>
 </aside>"""
@@ -187,12 +168,12 @@ def cruise_snapshot(
 
 def snapshot_default(**overrides: str) -> str:
     defaults = dict(
-        time_in_port="6–10 hours (typical dock port)",
-        best_for="Dunn's River Falls, Martha Brae rafting, Blue Hole, beach escapes",
+        time_in_port="Often around 6–10 hours — confirm your ship",
+        best_for="Martha Brae rafting, beaches, Dunn's River, Blue Hole",
         activity_level="Varies — see comparison",
-        family="Excellent with age-appropriate picks",
-        return_ship="Operators build 60–90 min buffer before all aboard",
-        popular="Dunn's River Falls, Martha Brae, Blue Hole, beach days",
+        family="Good options for mixed ages when chosen carefully",
+        return_ship="Plan a conservative buffer before all aboard; confirm with your operator",
+        popular="Martha Brae, beach days, Dunn's River Falls, Blue Hole",
     )
     defaults.update(overrides)
     return cruise_snapshot(**defaults)
@@ -201,7 +182,7 @@ def snapshot_default(**overrides: str) -> str:
 def return_to_ship_badge() -> str:
     return (
         f'<span class="return-to-ship-badge" role="status">'
-        f"{SHIP_ICON}Return To Ship On Time</span>"
+        f"{SHIP_ICON}Cruise-timed planning</span>"
     )
 
 
@@ -216,7 +197,7 @@ def why_choose_section(points: list[str]) -> str:
         for p in points
     )
     return f"""<section class="py-10 bg-sand-50"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 class="text-2xl font-display font-bold text-gray-900 mb-4">Why Cruise Passengers Choose This Jamaica Excursion</h2>
+  <h2 class="text-2xl font-display font-bold text-gray-900 mb-4">Why Cruise Passengers Consider This Option</h2>
   <ul class="grid sm:grid-cols-2 gap-3">{items}</ul>
 </div></section>"""
 
@@ -267,14 +248,14 @@ def hero_inner(
     bc = ""
     if breadcrumb:
         bc = f"""<nav class="site-hero__breadcrumb flex items-center gap-2 mb-4 text-xs text-white/60" aria-label="Breadcrumb">
-        <a href="index.html" class="hover:text-white transition-colors">Home</a>
+        <a href="/" class="hover:text-white transition-colors">Home</a>
         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         <span class="text-white/80">{breadcrumb}</span>
       </nav>"""
     cta_html = ""
     if cta:
         cta_html = (
-            f'<a href="{cta[0]}" class="btn-ocean inline-flex items-center justify-center gap-2 '
+            f'<a href="{href(cta[0])}" class="btn-ocean inline-flex items-center justify-center gap-2 '
             f'text-white font-semibold px-7 py-3 rounded-full text-sm shadow-xl">{cta[1]}</a>'
         )
     tags_html = ""
@@ -294,7 +275,7 @@ def hero_inner(
     <div class="max-w-3xl">
       {bc}
       <div class="site-hero__eyebrow inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 mb-3">
-        <span class="w-2 h-2 rounded-full bg-pr-400 animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-pr-400"></span>
         <span class="text-white/90 text-xs font-semibold tracking-widest uppercase">{eyebrow}</span>
       </div>
       <h1 class="site-hero__title text-4xl sm:text-5xl lg:text-[3.25rem] font-display font-bold text-white leading-tight mb-3">{title}</h1>
@@ -309,21 +290,22 @@ def hero_inner(
 
 def internal_links(extra: list[tuple[str, str]] | None = None) -> str:
     base = [
-        ("falmouth-port-guide.html", "Port Guide"),
-        ("best-falmouth-shore-excursions.html", "Best Excursions"),
-        ("one-day-in-falmouth-from-a-cruise-ship.html", "One Day in Falmouth"),
-        ("dunns-river-falls-guide.html", "Dunn's River Falls"),
-        ("martha-brae-river-rafting-guide.html", "Martha Brae Rafting"),
-        ("blue-hole-jamaica-guide.html", "Blue Hole Guide"),
+        ("falmouth-port-guide", "Port Guide"),
+        ("best-falmouth-shore-excursions", "Best Excursions"),
+        ("one-day-in-falmouth-from-a-cruise-ship", "One Day in Falmouth"),
+        ("martha-brae-river-rafting-guide", "Martha Brae Rafting"),
+        ("best-beaches-near-falmouth-jamaica", "Best Beaches"),
+        ("dunns-river-falls-guide", "Dunn's River Falls"),
+        ("falmouth-shore-excursions-faq", "FAQ"),
     ]
     if extra:
         base.extend(extra)
     parts = []
-    for i, (href, label) in enumerate(base):
+    for i, (path, label) in enumerate(base):
         if i:
             parts.append('<span class="text-gray-300">·</span>')
         parts.append(
-            f'<a href="{href}" class="text-ocean-600 hover:text-ocean-800 font-medium">{label}</a>'
+            f'<a href="{href(path)}" class="text-ocean-600 hover:text-ocean-800 font-medium">{label}</a>'
         )
     return f"""<nav class="mt-10 pt-8 border-t border-gray-100" aria-label="Related Falmouth guides">
   <p class="text-sm font-semibold text-gray-900 mb-3">Plan your port day</p>
@@ -341,7 +323,7 @@ def card_grid(cards: list[tuple]) -> str:
       <div class="p-6 flex flex-col flex-1">
         <h3 class="text-lg font-display font-semibold text-gray-900 mb-2">{title}</h3>
         <p class="text-sm text-gray-500 leading-relaxed flex-1">{desc}</p>
-        <a href="{link}" class="mt-5 btn-ocean inline-flex items-center justify-center text-white text-xs font-semibold px-5 py-2.5 rounded-full">{label}</a>
+        <a href="{href(link)}" class="mt-5 btn-ocean inline-flex items-center justify-center text-white text-xs font-semibold px-5 py-2.5 rounded-full">{label}</a>
       </div>
     </div>""")
     return '<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">' + "".join(items) + "</div>"
@@ -359,6 +341,7 @@ def content_tour_page(
     highlights_title: str = "Tour Highlights",
     highlights_subtitle: str = "What to expect on this Falmouth Jamaica shore excursion.",
     extra_links: list[tuple[str, str]] | None = None,
+    editorial_note: str | None = None,
 ) -> str:
     bl = "".join(
         f'<li class="flex gap-2 text-sm text-gray-600"><span class="text-ocean-500">✓</span>{b}</li>'
@@ -369,6 +352,9 @@ def content_tour_page(
         if badge
         else f'<div class="mb-4">{return_to_ship_badge()}</div>'
     )
+    note = editorial_note or (
+        "This page is editorial planning guidance. We do not take bookings or payments on this site in this phase."
+    )
     snap = snapshot_default(**snapshot_kwargs)
     highlights = tour_highlights(highlights_title, highlights_subtitle, highlights_cards)
     why = why_choose_section(why_choose)
@@ -377,6 +363,7 @@ def content_tour_page(
         {badge_html}
         <p class="text-gray-600 leading-relaxed mb-6">{intro}</p>
         <ul class="space-y-3 mb-6">{bl}</ul>
+        <p class="text-sm text-gray-500">{note}</p>
       </div>
       <div class="card-media rounded-3xl overflow-hidden aspect-[4/3] shadow-lg">
         <img src="{img}" alt="{alt}" width="600" height="450" loading="lazy" decoding="async" />
@@ -392,15 +379,15 @@ def comparison_section(rows: list[tuple]) -> str:
     body = ""
     for name, dur, best, activity, link in rows:
         body += f"""<tr class="border-b border-pr-50 hover:bg-sand-50/80">
-      <td class="py-4 pr-4 font-semibold text-gray-900"><a href="{link}" class="text-ocean-600 hover:text-ocean-800">{name}</a></td>
+      <td class="py-4 pr-4 font-semibold text-gray-900"><a href="{href(link)}" class="text-ocean-600 hover:text-ocean-800">{name}</a></td>
       <td class="py-4 px-3 text-gray-600">{dur}</td>
       <td class="py-4 px-3 text-gray-600">{best}</td>
       <td class="py-4 px-3 text-gray-600">{activity}</td>
-      <td class="py-4 pl-3"><a href="{link}" class="text-pr-600 font-medium text-xs whitespace-nowrap">Guide →</a></td>
+      <td class="py-4 pl-3"><a href="{href(link)}" class="text-pr-600 font-medium text-xs whitespace-nowrap">Explore →</a></td>
     </tr>"""
     return f"""<section class="py-16 bg-sand-50"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   <h2 class="text-3xl sm:text-4xl font-display font-bold text-gray-900 text-center mb-4">Which Falmouth Excursion Is Right for Me?</h2>
-  <p class="text-center text-gray-600 text-sm max-w-2xl mx-auto mb-10">Match your Falmouth port day to waterfalls, river rafting, Blue Hole adventures and beach escapes — all timed for typical 6–10 hour dock port calls in Falmouth Jamaica.</p>
+  <p class="text-center text-gray-600 text-sm max-w-2xl mx-auto mb-10">Match your Falmouth port day to river rafting, beaches, waterfalls and rainforest pools — always against the shore time your ship actually gives you.</p>
   <div class="overflow-x-auto rounded-3xl border border-pr-100 shadow-sm">
     <table class="w-full text-sm text-left min-w-[720px]">
       <thead class="bg-ocean-800 text-white">
@@ -420,7 +407,6 @@ def comparison_section(rows: list[tuple]) -> str:
 
 def tourist_trip_schema(name: str, description: str) -> dict:
     return {
-        "@context": "https://schema.org",
         "@type": "TouristTrip",
         "name": name,
         "description": description,
@@ -431,7 +417,6 @@ def tourist_trip_schema(name: str, description: str) -> dict:
 
 def faq_schema(questions: list[tuple[str, str]]) -> dict:
     return {
-        "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}}
@@ -440,33 +425,27 @@ def faq_schema(questions: list[tuple[str, str]]) -> dict:
     }
 
 
-def home_schema(faq: list[tuple[str, str]]) -> dict:
-    return {
-        "@context": "https://schema.org",
-        "@graph": [
-            {
-                "@type": "WebSite",
-                "name": SITE,
-                "url": f"{DOMAIN}/",
-                "description": "Planning guide for Falmouth Jamaica cruise shore excursions",
-            },
-            {
-                "@type": "LocalBusiness",
-                "name": SITE,
-                "url": f"{DOMAIN}/",
-                "description": "Cruise passenger planning guide for Falmouth Jamaica shore excursions",
-                "address": {
-                    "@type": "PostalAddress",
-                    "addressLocality": "Falmouth",
-                    "addressRegion": "Trelawny Parish",
-                    "addressCountry": "JM",
-                },
-                "areaServed": {
-                    "@type": "City",
-                    "name": "Falmouth",
-                    "containedInPlace": {"@type": "Country", "name": "Jamaica"},
-                },
-            },
-            faq_schema(faq),
-        ],
-    }
+def breadcrumb_schema(items: list[tuple[str, str]]) -> dict:
+    """items: list of (name, path) where path is extensionless or '' for home."""
+    elements = []
+    for i, (name, path) in enumerate(items, start=1):
+        url = f"{DOMAIN}/" if not path else f"{DOMAIN}/{path.lstrip('/')}"
+        elements.append({
+            "@type": "ListItem",
+            "position": i,
+            "name": name,
+            "item": url,
+        })
+    return {"@type": "BreadcrumbList", "itemListElement": elements}
+
+
+def home_schema(faq: list[tuple[str, str]]) -> list:
+    return [
+        {
+            "@type": "Organization",
+            "name": SITE,
+            "url": f"{DOMAIN}/",
+            "description": "Independent editorial planning guide for Falmouth Jamaica cruise shore excursions",
+        },
+        faq_schema(faq),
+    ]

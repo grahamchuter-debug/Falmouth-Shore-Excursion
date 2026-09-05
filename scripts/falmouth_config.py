@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOMAIN = "https://falmouthshoreexcursion.com"
 SITE = "Falmouth Shore Excursion"
-DATE = "2026-06-06"
+DATE = "2026-09-05"
 FONTS = (
     "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700"
     "&family=Source+Sans+3:wght@400;500;600;700&display=swap"
@@ -59,9 +59,9 @@ MARTHA_ALT = (
 )
 BLUE_HOLE_IMG = "images/blue-hole-jamaica.png"
 BLUE_HOLE_ALT = (
-    "Turquoise Blue Hole lagoon with cascading waterfall and lush tropical "
-    "rainforest on a Jamaica adventure shore excursion from Falmouth cruise "
-    "port"
+    "Island Gully Falls Blue Hole pool with cascading waterfall and lush "
+    "tropical rainforest near Ocho Rios — longer-distance shore excursion "
+    "option from Falmouth Jamaica cruise port"
 )
 BEACH_IMG = "images/jamaica-beach.png"
 BEACH_ALT = (
