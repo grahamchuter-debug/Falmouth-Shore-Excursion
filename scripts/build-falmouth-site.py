@@ -275,7 +275,7 @@ TRUST_META = [
      "about Falmouth Shore Excursion, Falmouth cruise planning guide",
      "about", "About"),
     ("contact.html", "Contact Falmouth Shore Excursion",
-     "Contact Falmouth Shore Excursion — independent cruise planning guide. Email routing pending manual verification.",
+     "Contact Falmouth Shore Excursion — independent cruise planning guide. Email hello@falmouthshoreexcursion.com.",
      "contact Falmouth Shore Excursion, Falmouth cruise guide contact",
      "contact", "Contact"),
     ("privacy.html", "Privacy Policy | Falmouth Shore Excursion",
