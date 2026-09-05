@@ -519,11 +519,11 @@ export default {
   },
   "routes": [
     {
-      "pattern": "falmouthshoreexcursion.com",
-      "custom_domain": true
+      "pattern": "www.falmouthshoreexcursion.com/*",
+      "zone_name": "falmouthshoreexcursion.com"
     },
     {
-      "pattern": "www.falmouthshoreexcursion.com/*",
+      "pattern": "falmouthshoreexcursion.com/*",
       "zone_name": "falmouthshoreexcursion.com"
     }
   ]
